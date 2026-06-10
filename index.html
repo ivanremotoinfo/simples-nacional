@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simples Nacional | SuporteADV</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d0d0d; color: #e0e0e0; padding: 24px 16px; }
+  .container { max-width: 760px; margin: 0 auto; }
+
+  .header { text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid #222; }
+  h1 { font-size: 1.5rem; color: #008080; margin-bottom: 6px; }
+  .subtitle { font-size: 0.88rem; color: #888; line-height: 1.5; }
+  .brand { font-size: 0.78rem; margin-top: 8px; color: #555; }
+  .brand span.s { color: #8B00FF; font-weight: 700; }
+  .brand span.a { color: #008080; font-weight: 700; }
+
+  .card { background: #111; border-radius: 10px; border: 1px solid #222; border-left: 3px solid #8B00FF; padding: 20px 22px; margin-bottom: 14px; transition: border-left-color 0.2s; }
+  .card:hover { border-left-color: #008080; }
+  .card-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
+  .field.full { grid-column: 1 / -1; }
+
+  .field label { display: block; font-size: 0.78rem; color: #888; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input, .field select {
+    width: 100%; padding: 9px 11px; border: 1.5px solid #333; border-radius: 6px;
+    font-size: 0.95rem; color: #fff; background: #1a1a1a; transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: #008080; box-shadow: 0 0 0 2px rgba(0,128,128,0.2); }
+  .field select option { background: #1a1a1a; }
+
+  .info-box { background: #0d1a1a; border: 1px solid #1a3a3a; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-size: 0.82rem; color: #666; line-height: 1.6; }
+  .info-box b { color: #008080; }
+
+  button.calcular { background: #008080; color: #fff; border: none; padding: 10px 26px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.07em; cursor: pointer; transition: background 0.18s; text-transform: uppercase; }
+  button.calcular:hover { background: #006666; box-shadow: 0 0 10px rgba(0,128,128,0.4); }
+
+  /* Resultado */
+  .resultado { background: #0a1a0a; border: 1px solid #1a4a1a; border-radius: 10px; padding: 20px 22px; margin-top: 14px; display: none; }
+  .resultado.visible { display: block; }
+  .resultado-titulo { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #008080; font-weight: 700; margin-bottom: 16px; }
+
+  .res-principal { text-align: center; margin-bottom: 20px; }
+  .res-principal label { display: block; font-size: 0.72rem; color: #555; text-transform: uppercase; margin-bottom: 6px; }
+  .res-principal .v { font-size: 1.8rem; font-weight: 700; color: #00ff00; font-family: 'Courier New', monospace; }
+  .res-principal .sub { font-size: 0.82rem; color: #555; margin-top: 4px; }
+
+  .res-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+  @media (max-width: 560px) { .res-grid { grid-template-columns: 1fr 1fr; } }
+  .res-item label { display: block; font-size: 0.68rem; color: #555; text-transform: uppercase; margin-bottom: 3px; }
+  .res-item .valor { font-size: 0.9rem; font-weight: 700; color: #ccc; font-family: 'Courier New', monospace; }
+  .res-item .valor.teal { color: #008080; }
+  .res-item .valor.verde { color: #00ff00; }
+  .res-item .valor.sec { color: #555; font-size: 0.85rem; }
+
+  .divider { border: none; border-top: 1px solid #1a3a1a; margin: 14px 0; }
+
+  /* Faixa destacada */
+  .faixa-box { background: #0d1a0d; border: 1px solid #1a4a1a; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .faixa-box .fb-info .fb-titulo { font-size: 0.75rem; color: #555; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+  .faixa-box .fb-info .fb-desc { font-size: 0.88rem; color: #ccc; }
+  .faixa-box .fb-valor { text-align: right; }
+  .faixa-box .fb-valor .fv-aliq { font-size: 1.4rem; font-weight: 700; color: #00ff00; font-family: 'Courier New', monospace; }
+  .faixa-box .fb-valor .fv-ef { font-size: 0.78rem; color: #555; margin-top: 2px; }
+
+  .comp-lista { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+  .comp-item { display: flex; justify-content: space-between; padding: 9px 14px; background: #111; border-radius: 7px; border-left: 3px solid #333; }
+  .comp-item.teal { border-left-color: #008080; }
+  .comp-item.total { background: #0d1a0d; border-left-color: #00ff00; }
+  .comp-item .ci-nome { font-size: 0.82rem; color: #888; }
+  .comp-item .ci-valor { font-size: 0.9rem; font-weight: 700; font-family: 'Courier New', monospace; color: #008080; }
+  .comp-item.total .ci-nome { color: #fff; font-weight: 700; }
+  .comp-item.total .ci-valor { color: #00ff00; font-size: 1rem; }
+
+  /* Tabela de faixas */
+  .faixas-wrap { margin-top: 14px; overflow-x: auto; }
+  .faixas-wrap summary { cursor: pointer; color: #555; font-size: 0.78rem; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 480px; }
+  th { text-align: left; color: #555; padding: 6px 8px; border-bottom: 1px solid #222; font-size: 0.7rem; text-transform: uppercase; }
+  td { color: #999; padding: 6px 8px; border-bottom: 1px solid #1a1a1a; }
+  tr:hover td { background: #151515; }
+  td.dest { color: #00ff00; font-weight: 700; font-family: 'Courier New', monospace; }
+  tr.atual-faixa { background: #0a1a0a; }
+  tr.atual-faixa td { color: #fff; }
+
+  .erro { background: #1a0a0a; border: 1px solid #4a1a1a; border-radius: 8px; padding: 14px 16px; color: #ff6666; font-size: 0.88rem; margin-top: 14px; display: none; }
+  .erro.visible { display: block; }
+  .aviso { font-size: 0.72rem; color: #444; margin-top: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Simples Nacional</h1>
+    <p class="subtitle">Calcule o DAS mensal pelo Simples Nacional com alíquota efetiva por faixa de receita acumulada (RBT12).</p>
+    <p class="brand"><span class="s">suporte</span><span class="a">ADV</span>.br — Ferramentas para Advogados</p>
+  </div>
+
+  <div class="card">
+    <div class="info-box">
+      <b>Como funciona o Simples Nacional?</b> O DAS é calculado pela fórmula: <b>Alíquota efetiva = (RBT12 × alíquota nominal − PD) ÷ RBT12</b>. Onde RBT12 = receita bruta acumulada nos últimos 12 meses, PD = parcela a deduzir da faixa. O imposto é a alíquota efetiva × receita do mês.
+    </div>
+
+    <div class="card-label">Dados da Empresa</div>
+    <div class="form-grid">
+      <div class="field full">
+        <label>Anexo / Atividade</label>
+        <select id="anexo" onchange="atualizarInfo()">
+          <option value="I">Anexo I — Comércio</option>
+          <option value="II">Anexo II — Indústria</option>
+          <option value="III">Anexo III — Serviços (locação, contabilidade, academias...)</option>
+          <option value="IV">Anexo IV — Serviços (construção, limpeza, vigilância...)</option>
+          <option value="V">Anexo V — Serviços (TI, publicidade, engenharia, advocacia...)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Receita do mês atual (R$)</label>
+        <input type="number" id="receitaMes" placeholder="Ex: 30000" step="0.01" min="0">
+      </div>
+      <div class="field">
+        <label>RBT12 — receita bruta acumulada 12 meses (R$)</label>
+        <input type="number" id="rbt12" placeholder="Ex: 360000" step="0.01" min="0">
+      </div>
+      <div class="field">
+        <label>Número de funcionários (CPP)</label>
+        <input type="number" id="funcionarios" value="0" min="0" max="100">
+      </div>
+      <div class="field">
+        <label>Pró-labore total (R$) — para fator r</label>
+        <input type="number" id="prolabore" value="0" step="0.01" min="0" placeholder="Anexo III/V: impacta fator r">
+      </div>
+    </div>
+    <div class="info-box" id="info-anexo" style="margin-bottom:0"></div>
+    <div style="margin-top:14px">
+      <button class="calcular" onclick="calcular()">CALCULAR DAS</button>
+    </div>
+  </div>
+
+  <div class="erro" id="erro"></div>
+
+  <div class="resultado" id="resultado">
+    <div class="resultado-titulo" id="res-titulo">DAS — Simples Nacional</div>
+
+    <div class="res-principal">
+      <label>💰 Valor do DAS mensal</label>
+      <div class="v" id="res-das">—</div>
+      <div class="sub" id="res-sub">—</div>
+    </div>
+
+    <div class="faixa-box">
+      <div class="fb-info">
+        <div class="fb-titulo">Faixa aplicável</div>
+        <div class="fb-desc" id="res-faixa-desc">—</div>
+      </div>
+      <div class="fb-valor">
+        <div class="fv-aliq" id="res-aliq-ef">—</div>
+        <div class="fv-ef">alíquota efetiva</div>
+      </div>
+    </div>
+
+    <div class="res-grid">
+      <div class="res-item"><label>RBT12</label><div class="valor teal" id="res-rbt12">—</div></div>
+      <div class="res-item"><label>Alíquota nominal</label><div class="valor" id="res-aliq-nom">—</div></div>
+      <div class="res-item"><label>Parcela dedução</label><div class="valor sec" id="res-pd">—</div></div>
+      <div class="res-item"><label>Receita do mês</label><div class="valor" id="res-receita-mes">—</div></div>
+    </div>
+
+    <hr class="divider">
+    <div class="resultado-titulo">Fórmula Aplicada</div>
+    <div class="comp-lista" id="comp-lista"></div>
+
+    <details class="faixas-wrap">
+      <summary>Ver todas as faixas do anexo</summary>
+      <table>
+        <thead><tr><th>Faixa</th><th>Receita acumulada (R$)</th><th>Alíquota nominal</th><th>Parcela dedução</th></tr></thead>
+        <tbody id="tabela-faixas"></tbody>
+      </table>
+    </details>
+
+    <p class="aviso">⚠️ O fator "r" (folha de salários ÷ RBT12) pode migrar empresas do Anexo V para o Anexo III quando ≥ 28%, reduzindo a tributação. O Simples Nacional abrange IRPJ, CSLL, PIS, COFINS, IPI, ICMS, ISS e CPP em um único DAS. MEI não usa esta tabela (tem valor fixo mensal). Consulte um contador para enquadramento correto.</p>
+  </div>
+
+</div>
+
+<script>
+// Tabelas Simples Nacional — LC 123/2006 (vigentes 2024/2025)
+const tabelas = {
+  I: {
+    nome: 'Anexo I — Comércio',
+    info: 'Comércio em geral: lojas, farmácias, supermercados, pet shops, papelarias etc.',
+    faixas: [
+      { ate: 180000,    aliq: 4.00, pd: 0 },
+      { ate: 360000,    aliq: 7.30, pd: 5940 },
+      { ate: 720000,    aliq: 9.50, pd: 13860 },
+      { ate: 1800000,   aliq: 10.70, pd: 22500 },
+      { ate: 3600000,   aliq: 14.30, pd: 87300 },
+      { ate: 4800000,   aliq: 19.00, pd: 378000 },
+    ]
+  },
+  II: {
+    nome: 'Anexo II — Indústria',
+    info: 'Indústria em geral: fabricação, manufatura, transformação de produtos.',
+    faixas: [
+      { ate: 180000,    aliq: 4.50, pd: 0 },
+      { ate: 360000,    aliq: 7.80, pd: 5940 },
+      { ate: 720000,    aliq: 10.00, pd: 13860 },
+      { ate: 1800000,   aliq: 11.20, pd: 22500 },
+      { ate: 3600000,   aliq: 14.70, pd: 85500 },
+      { ate: 4800000,   aliq: 30.00, pd: 720000 },
+    ]
+  },
+  III: {
+    nome: 'Anexo III — Serviços',
+    info: 'Serviços: locação de bens, academias, laboratórios, contabilidade, medicina, odontologia, representação comercial etc.',
+    faixas: [
+      { ate: 180000,    aliq: 6.00, pd: 0 },
+      { ate: 360000,    aliq: 11.20, pd: 9360 },
+      { ate: 720000,    aliq: 13.20, pd: 17640 },
+      { ate: 1800000,   aliq: 16.00, pd: 35640 },
+      { ate: 3600000,   aliq: 21.00, pd: 125640 },
+      { ate: 4800000,   aliq: 33.00, pd: 648000 },
+    ]
+  },
+  IV: {
+    nome: 'Anexo IV — Serviços (construção, limpeza)',
+    info: 'Construção civil, limpeza, vigilância, obras, instalações, manutenção. Não inclui CPP no DAS.',
+    faixas: [
+      { ate: 180000,    aliq: 4.50, pd: 0 },
+      { ate: 360000,    aliq: 9.00, pd: 8100 },
+      { ate: 720000,    aliq: 10.20, pd: 12420 },
+      { ate: 1800000,   aliq: 14.00, pd: 39780 },
+      { ate: 3600000,   aliq: 22.00, pd: 183780 },
+      { ate: 4800000,   aliq: 33.00, pd: 828000 },
+    ]
+  },
+  V: {
+    nome: 'Anexo V — Serviços (TI, engenharia, advocacia)',
+    info: 'TI, publicidade, engenharia, medicina veterinária, arquitetura, advocacia, jornalismo. Fator r ≥ 28% → migra para Anexo III.',
+    faixas: [
+      { ate: 180000,    aliq: 15.50, pd: 0 },
+      { ate: 360000,    aliq: 18.00, pd: 4500 },
+      { ate: 720000,    aliq: 19.50, pd: 9900 },
+      { ate: 1800000,   aliq: 20.50, pd: 17100 },
+      { ate: 3600000,   aliq: 23.00, pd: 62100 },
+      { ate: 4800000,   aliq: 30.50, pd: 540000 },
+    ]
+  },
+};
+
+const nomesFaixas = ['1ª Faixa','2ª Faixa','3ª Faixa','4ª Faixa','5ª Faixa','6ª Faixa'];
+
+function atualizarInfo() {
+  const anx = document.getElementById('anexo').value;
+  document.getElementById('info-anexo').innerHTML = `<b>${tabelas[anx].nome}:</b> ${tabelas[anx].info}`;
+}
+
+function fmtMoeda(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+function fmtPct(v, dec=2) { return v.toFixed(dec).replace('.',',') + '%'; }
+
+function showErro(msg) {
+  document.getElementById('erro').textContent = msg;
+  document.getElementById('erro').classList.add('visible');
+  document.getElementById('resultado').classList.remove('visible');
+}
+function hideErro() { document.getElementById('erro').classList.remove('visible'); }
+
+function getFaixa(rbt12, faixas) {
+  for (let i = 0; i < faixas.length; i++) {
+    if (rbt12 <= faixas[i].ate) return { idx: i, ...faixas[i] };
+  }
+  return { idx: faixas.length-1, ...faixas[faixas.length-1] };
+}
+
+function calcular() {
+  hideErro();
+  const receitaMes = parseFloat(document.getElementById('receitaMes').value);
+  if (!receitaMes || receitaMes <= 0) return showErro('Informe a receita do mês.');
+
+  let rbt12 = parseFloat(document.getElementById('rbt12').value);
+  if (!rbt12 || rbt12 <= 0) return showErro('Informe a RBT12 (receita acumulada dos últimos 12 meses).');
+
+  const anexoKey = document.getElementById('anexo').value;
+  const prolabore = parseFloat(document.getElementById('prolabore').value) || 0;
+  const funcionarios = parseInt(document.getElementById('funcionarios').value) || 0;
+
+  // Fator r para Anexo III/V
+  let anexoEfetivo = anexoKey;
+  let fatorR = 0;
+  if ((anexoKey === 'V') && rbt12 > 0) {
+    // Folha 12 meses estimada = prolabore * 12
+    const folha12 = prolabore * 12;
+    fatorR = folha12 / rbt12;
+    if (fatorR >= 0.28) {
+      anexoEfetivo = 'III';
+    }
+  }
+
+  if (rbt12 > 4800000) return showErro('Receita acima de R$ 4,8 milhões — empresa não se enquadra no Simples Nacional.');
+
+  const tabela = tabelas[anexoEfetivo];
+  const faixa = getFaixa(rbt12, tabela.faixas);
+
+  // Alíquota efetiva
+  const aliqEfetiva = (rbt12 * faixa.aliq / 100 - faixa.pd) / rbt12;
+  const das = receitaMes * aliqEfetiva;
+  const cargaPct = aliqEfetiva * 100;
+
+  const faixaLabel = `${nomesFaixas[faixa.idx]} — até ${fmtMoeda(faixa.ate)}`;
+
+  document.getElementById('res-titulo').textContent = `DAS — ${tabela.nome}${anexoEfetivo !== anexoKey ? ' (migrou para III pelo fator r)' : ''}`;
+  document.getElementById('res-das').textContent = fmtMoeda(das);
+  document.getElementById('res-sub').textContent = `Alíquota efetiva: ${fmtPct(cargaPct)} | RBT12: ${fmtMoeda(rbt12)} | ${faixaLabel}`;
+  document.getElementById('res-faixa-desc').textContent = faixaLabel + ` | Alíquota nominal: ${fmtPct(faixa.aliq)} | PD: ${fmtMoeda(faixa.pd)}`;
+  document.getElementById('res-aliq-ef').textContent = fmtPct(cargaPct);
+  document.getElementById('res-rbt12').textContent = fmtMoeda(rbt12);
+  document.getElementById('res-aliq-nom').textContent = fmtPct(faixa.aliq);
+  document.getElementById('res-pd').textContent = fmtMoeda(faixa.pd);
+  document.getElementById('res-receita-mes').textContent = fmtMoeda(receitaMes);
+
+  // Composição — fórmula passo a passo
+  const lista = document.getElementById('comp-lista');
+  lista.innerHTML = '';
+  const addItem = (nome, valor, cls='', tot=false, isMoeda=true) => {
+    const div = document.createElement('div');
+    div.className = `comp-item${cls?' '+cls:''}${tot?' total':''}`;
+    div.innerHTML = `<span class="ci-nome">${nome}</span><span class="ci-valor">${isMoeda ? fmtMoeda(valor) : valor}</span>`;
+    lista.appendChild(div);
+  };
+  addItem('RBT12 (receita acumulada 12 meses)', rbt12);
+  addItem(`Alíquota nominal da faixa (${fmtPct(faixa.aliq)})`, rbt12 * faixa.aliq / 100, 'teal');
+  addItem('(−) Parcela a deduzir (PD)', faixa.pd);
+  addItem(`Resultado (RBT12 × alíq. − PD)`, rbt12 * faixa.aliq / 100 - faixa.pd, 'teal');
+  addItem(`Alíquota efetiva = resultado ÷ RBT12`, aliqEfetiva * 100, '', false, false);
+  addItem(`Receita do mês × ${fmtPct(cargaPct)}`, das, '', true);
+
+  if (fatorR > 0) {
+    addItem(`Fator r = folha÷RBT12 (${fmtPct(fatorR*100)})${fatorR>=0.28?' → migrou Anexo III':' → permanece Anexo V'}`, fatorR * 100, '', false, false);
+  }
+
+  // Tabela de faixas
+  const tbody = document.getElementById('tabela-faixas');
+  tbody.innerHTML = '';
+  tabela.faixas.forEach((f, i) => {
+    const tr = document.createElement('tr');
+    if (i === faixa.idx) tr.className = 'atual-faixa';
+    const aliqEf = (rbt12 * f.aliq / 100 - f.pd) / rbt12 * 100;
+    tr.innerHTML = `
+      <td>${nomesFaixas[i]}${i===faixa.idx?' ◀ atual':''}</td>
+      <td>${i===0?'Até ':i===5?'Acima de R$360k — ':'De '}${i===0?'':fmtMoeda(i>0?tabela.faixas[i-1].ate:0)+' até '}${fmtMoeda(f.ate)}</td>
+      <td class="dest">${fmtPct(f.aliq)}</td>
+      <td style="color:#555">${fmtMoeda(f.pd)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('resultado').classList.add('visible');
+}
+
+// Init
+atualizarInfo();
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { const f = document.activeElement; if (f && (f.tagName==='INPUT'||f.tagName==='SELECT')) calcular(); }
+});
+</script>
+</body>
+</html>
